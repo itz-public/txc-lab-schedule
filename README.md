@@ -18,9 +18,9 @@ https://raw.githubusercontent.com/itz-public/txc-lab-schedule/main/schedule.json
 ```json
 {
   "schemaVersion": 1,
-  "scheduleVersion": 1,
-  "timezone": "America/Los_Angeles",
-  "activeDates": ["2026-10-19", "2026-10-20"],
+  "scheduleVersion": 2,
+  "timezone": "America/New_York",
+  "activeDates": ["2026-10-26", "2026-10-27"],
   "dailyResets": [
     { "id": "lunch", "time": "12:30", "label": "Lunch changeover" }
   ],

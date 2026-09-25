@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "scheduleVersion": 1,
-  "updated": "2026-09-24T00:00:00Z",
+  "scheduleVersion": 2,
+  "updated": "2026-09-25T03:15:00Z",
   "comment": "Reset schedule for TXC lab machines. Times are local to 'timezone'. Every lab carries the same schedule. No names, titles or room identifiers belong in this file - it is public.",
 
-  "timezone": "America/Los_Angeles",
+  "timezone": "America/New_York",
 
   "activeDates": [
-    "2026-10-19",
-    "2026-10-20",
-    "2026-10-21",
-    "2026-10-22"
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29"
   ],
 
   "dailyResets": [
