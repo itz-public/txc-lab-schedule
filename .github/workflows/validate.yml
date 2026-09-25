@@ -1,0 +1,18 @@
+name: Validate schedule
+
+# This feed decides when lab machines erase student work. A malformed or
+# implausible edit must fail here, in a pull request, rather than on twenty
+# machines at an event.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate schedule.json
+        run: python3 validate.py schedule.json

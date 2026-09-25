@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "scheduleVersion": 1,
+  "updated": "2026-09-24T00:00:00Z",
+  "comment": "Reset schedule for TXC lab machines. Times are local to 'timezone'. Every lab carries the same schedule. No names, titles or room identifiers belong in this file - it is public.",
+
+  "timezone": "America/Los_Angeles",
+
+  "activeDates": [
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22"
+  ],
+
+  "dailyResets": [
+    { "id": "pre-open",   "time": "07:45", "label": "Before doors open" },
+    { "id": "mid-morning","time": "10:45", "label": "Between morning sessions" },
+    { "id": "lunch",      "time": "12:30", "label": "Lunch changeover" },
+    { "id": "mid-aft",    "time": "15:15", "label": "Between afternoon sessions" },
+    { "id": "close",      "time": "18:30", "label": "End of day" }
+  ],
+
+  "guard": {
+    "warnMinutes": 5,
+    "postponeMinutes": 15,
+    "maxPostpones": 2,
+    "idleMinutes": 10
+  },
+
+  "scriptVersion": "1.0.0"
+}
