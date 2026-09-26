@@ -1,32 +1,114 @@
 {
-  "schemaVersion": 1,
-  "scheduleVersion": 2,
-  "updated": "2026-09-25T03:15:00Z",
-  "comment": "Reset schedule for TXC lab machines. Times are local to 'timezone'. Every lab carries the same schedule. No names, titles or room identifiers belong in this file - it is public.",
-
+  "schemaVersion": 2,
+  "scheduleVersion": 3,
+  "updated": "2026-09-26T14:09:59Z",
+  "comment": "Reset schedule for TXC lab machines. Times are local to 'timezone'. Keyed by date because each event day has a different session timetable. A date not listed here never resets. No names, titles or room identifiers belong in this file - it is public.",
   "timezone": "America/New_York",
-
-  "activeDates": [
-    "2026-10-26",
-    "2026-10-27",
-    "2026-10-28",
-    "2026-10-29"
-  ],
-
-  "dailyResets": [
-    { "id": "pre-open",   "time": "07:45", "label": "Before doors open" },
-    { "id": "mid-morning","time": "10:45", "label": "Between morning sessions" },
-    { "id": "lunch",      "time": "12:30", "label": "Lunch changeover" },
-    { "id": "mid-aft",    "time": "15:15", "label": "Between afternoon sessions" },
-    { "id": "close",      "time": "18:30", "label": "End of day" }
-  ],
-
+  "days": {
+    "2026-10-26": [
+      {
+        "id": "pre-open",
+        "time": "09:30",
+        "label": "Before doors open"
+      },
+      {
+        "id": "s1",
+        "time": "11:35",
+        "label": "After session 1"
+      },
+      {
+        "id": "s2",
+        "time": "13:50",
+        "label": "After session 2"
+      },
+      {
+        "id": "s3",
+        "time": "15:50",
+        "label": "After session 3"
+      },
+      {
+        "id": "close",
+        "time": "17:50",
+        "label": "End of day"
+      }
+    ],
+    "2026-10-27": [
+      {
+        "id": "pre-open",
+        "time": "10:00",
+        "label": "Before doors open"
+      },
+      {
+        "id": "s1",
+        "time": "11:50",
+        "label": "After session 1"
+      },
+      {
+        "id": "s2",
+        "time": "14:20",
+        "label": "After session 2"
+      },
+      {
+        "id": "s3",
+        "time": "16:20",
+        "label": "After session 3"
+      },
+      {
+        "id": "close",
+        "time": "18:20",
+        "label": "End of day"
+      }
+    ],
+    "2026-10-28": [
+      {
+        "id": "pre-open",
+        "time": "10:00",
+        "label": "Before doors open"
+      },
+      {
+        "id": "s1",
+        "time": "11:50",
+        "label": "After session 1"
+      },
+      {
+        "id": "s2",
+        "time": "14:20",
+        "label": "After session 2"
+      },
+      {
+        "id": "s3",
+        "time": "16:20",
+        "label": "After session 3"
+      },
+      {
+        "id": "close",
+        "time": "18:20",
+        "label": "End of day"
+      }
+    ],
+    "2026-10-29": [
+      {
+        "id": "pre-open",
+        "time": "08:30",
+        "label": "Before doors open"
+      },
+      {
+        "id": "s1",
+        "time": "10:35",
+        "label": "After session 1"
+      },
+      {
+        "id": "close",
+        "time": "12:35",
+        "label": "End of day"
+      }
+    ]
+  },
   "guard": {
     "warnMinutes": 5,
-    "postponeMinutes": 15,
+    "postponeMinutes": 5,
     "maxPostpones": 2,
     "idleMinutes": 10
   },
-
   "scriptVersion": "1.0.0"
 }
