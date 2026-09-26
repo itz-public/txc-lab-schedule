@@ -19,7 +19,7 @@ import re
 import sys
 from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -81,58 +81,72 @@ def check(path: Path):
             f"Add it to IanaToWindows in lib/Schedule.ps1 and to KNOWN_ZONES here, or pick another."
         )
 
-    # --- slots ---
-    slots = feed.get("dailyResets")
-    if not isinstance(slots, list) or not slots:
-        errors.append("dailyResets must be a non-empty list")
-        slots = []
-    if len(slots) > 24:
-        errors.append(f"{len(slots)} resets in one day is implausible")
+    # --- days ---
+    #
+    # Keyed by date, because the four event days have four different session
+    # timetables. This was one shared list of daily times, and three of the five
+    # published resets landed mid-session on three of the four days. A date that
+    # is not a key here simply never resets.
+    days = feed.get("days")
+    if not isinstance(days, dict) or not days:
+        errors.append("days must be a non-empty object keyed by yyyy-MM-dd, or the schedule never fires")
+        days = {}
+    if len(days) > 31:
+        errors.append(f"{len(days)} days is implausible")
 
-    seen, times = set(), []
-    for i, s in enumerate(slots):
-        if not isinstance(s, dict):
-            errors.append(f"dailyResets[{i}] is not an object")
-            continue
-        sid = s.get("id")
-        if not sid:
-            errors.append(f"dailyResets[{i}] has no id")
-        elif sid in seen:
-            errors.append(f"duplicate slot id {sid!r}")
-        else:
-            seen.add(sid)
-        t = s.get("time", "")
-        if not TIME_RE.match(str(t)):
-            errors.append(f"slot {sid!r}: time {t!r} must be HH:MM in 24-hour form")
-        else:
-            times.append((t, sid))
-
-    # Two resets close together means the second fires while the first is still
-    # running, or immediately after - almost always a typo.
-    times.sort()
-    for (t1, id1), (t2, id2) in zip(times, times[1:]):
-        m1 = int(t1[:2]) * 60 + int(t1[3:])
-        m2 = int(t2[:2]) * 60 + int(t2[3:])
-        if m2 - m1 < 30:
-            warnings.append(f"{id1} ({t1}) and {id2} ({t2}) are only {m2 - m1} minutes apart")
-
-    # --- dates ---
-    dates = feed.get("activeDates")
-    if not isinstance(dates, list) or not dates:
-        errors.append("activeDates must be a non-empty list, or the schedule never fires")
-        dates = []
     today = dt.date.today()
-    parsed = []
-    for d in dates:
-        if not DATE_RE.match(str(d)):
-            errors.append(f"activeDates: {d!r} must be yyyy-MM-dd")
+    parsed_dates = []
+
+    for date in sorted(days):
+        slots = days[date]
+
+        if not DATE_RE.match(str(date)):
+            errors.append(f"days: {date!r} must be yyyy-MM-dd")
             continue
         try:
-            parsed.append(dt.date.fromisoformat(d))
+            parsed_dates.append(dt.date.fromisoformat(date))
         except ValueError:
-            errors.append(f"activeDates: {d!r} is not a real date")
-    if parsed and all(p < today for p in parsed):
-        warnings.append("every activeDate is in the past; this schedule will never fire")
+            errors.append(f"days: {date!r} is not a real date")
+            continue
+
+        if not isinstance(slots, list) or not slots:
+            errors.append(f"{date}: must have a non-empty list of resets")
+            continue
+        if len(slots) > 24:
+            errors.append(f"{date}: {len(slots)} resets in one day is implausible")
+
+        # Ids need only be unique within their own day. The machines key slot
+        # state by date/id, so 'close' on Monday and 'close' on Tuesday are
+        # different slots and both are allowed.
+        seen, times = set(), []
+        for i, s in enumerate(slots):
+            if not isinstance(s, dict):
+                errors.append(f"{date}: entry {i} is not an object")
+                continue
+            sid = s.get("id")
+            if not sid:
+                errors.append(f"{date}: entry {i} has no id")
+            elif sid in seen:
+                errors.append(f"{date}: duplicate slot id {sid!r}")
+            else:
+                seen.add(sid)
+            tval = s.get("time", "")
+            if not TIME_RE.match(str(tval)):
+                errors.append(f"{date} slot {sid!r}: time {tval!r} must be HH:MM in 24-hour form")
+            else:
+                times.append((tval, sid))
+
+        # Two resets close together means the second fires while the first is
+        # still running, or immediately after - almost always a typo.
+        times.sort()
+        for (t1, id1), (t2, id2) in zip(times, times[1:]):
+            m1 = int(t1[:2]) * 60 + int(t1[3:])
+            m2 = int(t2[:2]) * 60 + int(t2[3:])
+            if m2 - m1 < 30:
+                warnings.append(f"{date}: {id1} ({t1}) and {id2} ({t2}) are only {m2 - m1} minutes apart")
+
+    if parsed_dates and all(p < today for p in parsed_dates):
+        warnings.append("every date is in the past; this schedule will never fire")
 
     # --- guard ---
     g = feed.get("guard", {})
@@ -147,6 +161,15 @@ def check(path: Path):
                     errors.append(f"guard.{key} must be an integer between {lo} and {hi}, found {v!r}")
         if g.get("warnMinutes", 5) < 2:
             warnings.append("guard.warnMinutes under 2 gives a student almost no time to save work")
+        # A postponed reset must still finish inside the gap between sessions.
+        # This file does not know the session times, so it can only flag a
+        # budget that would be unsafe against any realistic changeover.
+        slip = g.get("warnMinutes", 5) + g.get("postponeMinutes", 15) * g.get("maxPostpones", 2)
+        if slip > 20:
+            warnings.append(
+                f"a reset can slip {slip} min (warnMinutes + postponeMinutes x maxPostpones). "
+                f"Check that fits the gap between sessions, or a postponed reset lands in the next one."
+            )
 
     # --- nothing identifying ---
     def scan(node, where=""):
