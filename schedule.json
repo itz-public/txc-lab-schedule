@@ -1,10 +1,24 @@
 {
   "schemaVersion": 2,
-  "scheduleVersion": 3,
-  "updated": "2026-09-26T14:09:59Z",
+  "scheduleVersion": 4,
+  "updated": "2026-10-24T19:53:44Z",
   "comment": "Reset schedule for TXC lab machines. Times are local to 'timezone'. Keyed by date because each event day has a different session timetable. A date not listed here never resets. No names, titles or room identifiers belong in this file - it is public.",
   "timezone": "America/New_York",
   "days": {
+    "2026-10-24": [
+      {
+        "id": "test",
+        "time": "17:30",
+        "label": "Test reset"
+      }
+    ],
+    "2026-10-25": [
+      {
+        "id": "test",
+        "time": "16:15",
+        "label": "Test reset"
+      }
+    ],
     "2026-10-26": [
       {
         "id": "pre-open",
@@ -20,11 +34,6 @@
         "id": "s2",
         "time": "13:50",
         "label": "After session 2"
-      },
-      {
-        "id": "s3",
-        "time": "15:50",
-        "label": "After session 3"
       },
       {
         "id": "close",
